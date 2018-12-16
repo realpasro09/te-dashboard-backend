@@ -1,7 +1,7 @@
 const Perfil = require("../models/perfiles");
 
 module.exports.delete = {
-  handler: function(req, reply) {
+  handler: function (req, reply) {
     if (!req.params.id) {
       return reply({ err: "id es un parámetro requerido" }).code(400);
     }
@@ -33,24 +33,30 @@ module.exports.delete = {
 };
 
 module.exports.create = {
-  handler: function(req, reply) {
-    if (!req.payload.nombre) {
+  handler: function (req, reply) {
+    let payload = req.payload;
+    try {
+      payload = JSON.parse(req.payload);
+    } catch (e) {
+      payload = req.payload;
+    }
+    if (!payload.nombre) {
       return reply({ er: "nombre es requirido" }).code(400);
     }
 
-    if (!req.payload.categorias) {
+    if (!payload.categorias) {
       return reply({ er: "requiere al menos una categoria" }).code(400);
     }
 
-    if (!req.payload.busquedas) {
+    if (!payload.busquedas) {
       return reply({ er: "requiere al menos una busqueda" }).code(400);
     }
 
     Perfil.create(
       {
-        nombre: req.payload.nombre,
-        categorias: req.payload.categorias,
-        busquedas: req.payload.busquedas,
+        nombre: payload.nombre,
+        categorias: payload.categorias,
+        busquedas: payload.busquedas,
         inactivo: false
       },
       err => {
@@ -64,7 +70,7 @@ module.exports.create = {
 };
 
 module.exports.update = {
-  handler: function(req, reply) {
+  handler: function (req, reply) {
     if (!req.params.id) {
       return reply.response({ err: "id es un parámetro requerido" });
     }
@@ -135,7 +141,7 @@ module.exports.update = {
 };
 
 module.exports.searchById = {
-  handler: function(req, reply) {
+  handler: function (req, reply) {
     if (!req.params.id) {
       return reply.response({ err: "id es un parámetro requerido" });
     }
@@ -179,8 +185,8 @@ module.exports.searchById = {
 };
 
 module.exports.find = {
-  handler: function(req, reply) {
-    Perfil.find({inactivo: false}, "id nombre", (err, perfiles) => {
+  handler: function (req, reply) {
+    Perfil.find({ inactivo: false }, "id nombre", (err, perfiles) => {
       if (err) {
         return reply.response({ err });
       }
