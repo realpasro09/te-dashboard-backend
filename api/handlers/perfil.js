@@ -83,7 +83,14 @@ module.exports.update = {
       if (perfil.inactivo) {
         return reply.response({ err: "No existe el perfil" });
       } else {
-        Perfil.find({ nombre: req.payload.nombre }, (findErr, docs) => {
+        let payload = req.payload;
+        try {
+          payload = JSON.parse(req.payload);
+        } catch (e) {
+          payload = req.payload;
+        }
+
+        Perfil.find({ nombre: payload.nombre }, (findErr, docs) => {
           if (findErr) {
             return reply.response({ findErr });
           }
@@ -93,32 +100,32 @@ module.exports.update = {
           } else {
             let attributes = {};
 
-            if (req.payload.nombre) {
-              attributes.nombre = req.payload.nombre;
+            if (payload.nombre) {
+              attributes.nombre = payload.nombre;
             }
 
-            if (req.payload.categorias) {
-              if (req.payload.categorias.length < 1) {
+            if (payload.categorias) {
+              if (payload.categorias.length < 1) {
                 return reply.response({
                   err: "Debe de seleccionar al menos una categoría"
                 });
               }
 
-              attributes.categorias = req.payload.categorias;
+              attributes.categorias = payload.categorias;
             }
 
-            if (req.payload.busquedas) {
-              if (req.payload.busquedas.length < 1) {
+            if (payload.busquedas) {
+              if (payload.busquedas.length < 1) {
                 return reply.response({
                   err: "Debe de tener al menos un criterio de búsqueda"
                 });
               }
 
-              attributes.busquedas = req.payload.busquedas;
+              attributes.busquedas = payload.busquedas;
             }
 
-            if (req.payload.inactivo) {
-              attributes.inactivo = req.payload.inactivo;
+            if (payload.inactivo) {
+              attributes.inactivo = payload.inactivo;
             }
 
             Perfil.findByIdAndUpdate(
@@ -154,31 +161,7 @@ module.exports.searchById = {
       if (perfil.inactivo) {
         return reply.response({ err: "No existe el perfil" });
       } else {
-        Perfil.find({ nombre: req.payload.nombre }, (findErr) => {
-          if (findErr) {
-            return reply.response({ findErr });
-          }
-          let attributes = {};
-
-          if (req.payload.nombre) {
-            attributes.nombre = req.payload.nombre;
-            attributes.categorias = req.payload.categorias;
-            attributes.busquedas = req.payload.busquedas;
-            attributes.inactivo = req.payload.inactivo;
-          }
-
-          Perfil.search(
-            req.params.id,
-            attributes,
-            (err, perfil) => {
-              if (err) {
-                return reply(err).code(500);
-              }
-
-              return reply.response(perfil);
-            }
-          );
-        });
+        return reply.response(perfil);
       }
     });
   }
