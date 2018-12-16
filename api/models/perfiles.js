@@ -6,10 +6,9 @@ const PerfilesSchema = new Schema({
     required: true,
     type: String
   },
-  categorias: [String],
+  categorias: [{ nombre: String, seleccionado: Boolean }],
   busquedas: [String],
   inactivo: Boolean
 });
 
 module.exports = mongoose.model("perfiles", PerfilesSchema);
-
